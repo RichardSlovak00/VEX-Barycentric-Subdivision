@@ -41,9 +41,6 @@ foreach(int i = 0; i < len(centers); i++){
     int poly_2 = addprim(geoself(),"polyline",center_pt,next_pt,extract_center);
     setprimattrib(geoself(), "N", poly_1 ,v@N);
     setprimattrib(geoself(), "N", poly_2, v@N);
-    setprimgroup(geoself(),"subd",poly_1,1);
-    setprimgroup(geoself(),"subd",poly_2,1);
-
 }
 removeprim(geoself(),@primnum,1);
 
