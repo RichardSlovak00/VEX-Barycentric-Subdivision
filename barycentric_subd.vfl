@@ -32,7 +32,7 @@ int pt_center_2 = addpoint(geoself(),center_2);
 int centers[] = array(pt_center_0,pt_center_1,pt_center_2); //barycentric subdividing
 
 /* connect the midpoints accordingly */
-foreach(int i = 0; i < len(centers); i++){
+for(int i = 0; i < len(centers); i++){
     int extract_center = centers[i];
     int step = (i - 1);
     int pt = pts[i];
