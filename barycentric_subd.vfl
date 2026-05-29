@@ -1,0 +1,49 @@
+/* context: attribute wrangle (run over primitives) in a feedback loop
+ * reference: https://en.wikipedia.org/wiki/Barycentric_subdivision
+ * NOTE make sure to triangulate your geometry!
+ * Keep in mind that it generates new points pretty quickly (and also duplicate ones so you need to fuse them right after),
+ * on two triangles after 7 iterations it generates ~2.7m points.
+ * */
+
+#define SECOND_INPUT 1
+
+
+int pts[] = primpoints(geoself(),@primnum);
+vector center_tri = @P;
+int center_pt = addpoint(geoself(),center_tri);
+vector norm = point(geoself(),"N",pts[0]);
+
+int size = len(pts);
+vector pt_pos_0 = point(geoself(),"P",pts[0]);
+vector pt_pos_1 = point(geoself(),"P",pts[1]);
+vector pt_pos_2 = point(geoself(),"P",pts[2]);
+
+/* get the midpoints of each side of the triangle */
+vector center_0 = (pt_pos_0 - pt_pos_2) * 0.5 + pt_pos_2;
+vector center_1 = (pt_pos_0 - pt_pos_1) * 0.5 + pt_pos_1;
+vector center_2 = (pt_pos_1 - pt_pos_2) * 0.5 + pt_pos_2;
+
+/* create the midpoints */
+int pt_center_0 = addpoint(geoself(),center_0);
+int pt_center_1 = addpoint(geoself(),center_1);
+int pt_center_2 = addpoint(geoself(),center_2);
+
+
+int centers[] = array(pt_center_0,pt_center_1,pt_center_2); //barycentric subdividing
+
+/* connect the midpoints accordingly */
+foreach(int i = 0; i < len(centers); i++){
+    int extract_center = centers[i];
+    int step = (i - 1);
+    int pt = pts[i];
+    int next_pt = pts[step];
+    int poly_1 = addprim(geoself(),"polyline",center_pt,extract_center,pt);
+    int poly_2 = addprim(geoself(),"polyline",center_pt,next_pt,extract_center);
+    setprimattrib(geoself(), "N", poly_1 ,v@N);
+    setprimattrib(geoself(), "N", poly_2, v@N);
+    setprimgroup(geoself(),"subd",poly_1,1);
+    setprimgroup(geoself(),"subd",poly_2,1);
+
+}
+removeprim(geoself(),@primnum,1);
+
